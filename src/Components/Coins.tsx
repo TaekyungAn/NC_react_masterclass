@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
 
@@ -95,32 +94,9 @@ interface ICoinsProps {
   toggleDark: () => void;
 }
 
-function Coins({ toggleDark }: ICoinsProps) {
+function Coins() {
   const { isLoading, data } = useQuery<ICoin[]>(["allCoins"], fetchCoins);
-
-  // const [coins, setCoins] = useState<ICoin[]>([]);
-  // const [loading, setLoading] = useState(true);
-
-  // React-query 사용 전, 상태함수로 관리할때 (async/await사용)
-  // useEffect(() => {
-  //   (async () => {
-  //     const response = await fetch("https://api.coinpaprika.com/v1/coins");
-  //     const json = await response.json();
-  //     setCoins(json.slice(0, 100));
-  //     setLoading(false);
-  //   })();
-  // }, []);
-
-  // 참고: axios로 사용하는 방법
-  //   const getCoins = async () => {
-  //     const res = await axios("https://api.coinpaprika.com/v1/coins");
-  //     setCoins(res.data.slice(0, 100));
-  //     setLoading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     getCoins();
-  //   });
+  const { toggleDark } = useOutletContext<ICoinsProps>();
 
   return (
     <Container>

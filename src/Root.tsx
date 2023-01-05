@@ -80,7 +80,7 @@ function Root() {
       <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
         <GlobalStyle />
         <HelmetProvider>
-          <Outlet toggleDark={toggleDark} />
+          <Outlet context={{ toggleDark }} />
         </HelmetProvider>
         <ReactQueryDevtools initialIsOpen={true} />
       </ThemeProvider>
