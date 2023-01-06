@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { Link, useMatch } from "react-router-dom";
@@ -149,10 +150,10 @@ function Coin() {
       <Header>
         <Link to={`/`}>&lt; Home</Link>
         <Title>
-          <img
+          {/* <img
             alt={infoData?.symbol}
             src={`https://coinicons-api.vercel.app/api/icon/${infoData?.symbol.toLowerCase()}`}
-          />
+          /> */}
           {state?.name ? state.name : loading ? "loading..." : infoData?.name}
         </Title>
         <button onClick={toggleDark}>Toggle Mode</button>
