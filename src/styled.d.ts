@@ -5,7 +5,10 @@ import "styled-components";
 declare module "styled-components" {
   export interface DefaultTheme {
     textColor: string;
+    priceColor: string;
     bgColor: string;
+    cardColor: string;
     accentColor: string;
+    boxshadowColor: string;
   }
 }

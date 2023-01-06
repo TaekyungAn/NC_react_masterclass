@@ -10,14 +10,32 @@ const Container = styled.div`
 const Header = styled.header`
   height: 10vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+
+  padding: 70px 0;
+  div {
+    width: 100px;
+    height: 40px;
+  }
+  button {
+    border: none;
+    background-color: transparent;
+    box-shadow: ${(props) => props.theme.boxshadowColor};
+    border-radius: 10px;
+    width: 100px;
+    height: 40px;
+
+    color: white;
+
+    cursor: pointer;
+  }
 `;
 
 const CoinList = styled.ul``;
 
 const Coin = styled.li`
-  background-color: white;
+  background-color: ${(props) => props.theme.cardColor};
   color: ${(props) => props.theme.textColor};
   border-radius: 15px;
   margin-bottom: 10px;
@@ -25,7 +43,7 @@ const Coin = styled.li`
     display: flex;
     align-items: center;
     padding: 20px;
-    transition: color 0.2s ease-in;
+    transition: color 0.1s ease-in;
   }
   &:hover {
     a {
@@ -90,13 +108,16 @@ interface ICoin {
   type: string;
 }
 
-interface ICoinsProps {
+export interface ICoinsProps {
   toggleDark: () => void;
+  isDark: boolean;
 }
 
 function Coins() {
   const { isLoading, data } = useQuery<ICoin[]>(["allCoins"], fetchCoins);
   const { toggleDark } = useOutletContext<ICoinsProps>();
+  const cutData = data?.slice(0, 100);
+  console.log(cutData);
 
   return (
     <Container>
@@ -104,6 +125,7 @@ function Coins() {
         <title>Coins</title>
       </Helmet>
       <Header>
+        <div></div>
         <Title>Coins</Title>
         <button onClick={toggleDark}>Toggle Mode</button>
       </Header>
@@ -113,7 +135,7 @@ function Coins() {
         ) : (
           data?.slice(0, 100).map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`} state={coin.name}>
+              <Link to={`/${coin.id}/chart`} state={coin.name}>
                 <Img
                   src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}
                 />

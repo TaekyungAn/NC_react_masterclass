@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useMatch } from "react-router-dom";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useParams,
+  useOutletContext,
+} from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
+import { IInfoData, IPriceData, RouteState } from "../Interface";
+import { ICoinsProps } from "./Coins";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -13,18 +19,55 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 48px;
   color: ${(props) => props.theme.accentColor};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    width: 40px;
+    height: 40px;
+
+    margin-right: 10px;
+  }
 `;
 
 const Header = styled.header`
   height: 10vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+
+  padding: 70px 0;
+  a {
+    width: 100px;
+    height: 40px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+
+    border-radius: 10px;
+    box-shadow: ${(props) => props.theme.boxshadowColor};
+  }
+  button {
+    border: none;
+    background-color: transparent;
+    box-shadow: ${(props) => props.theme.boxshadowColor};
+    border-radius: 10px;
+    width: 100px;
+    height: 40px;
+
+    color: white;
+
+    cursor: pointer;
+  }
 `;
 const Overview = styled.div`
   display: flex;
   justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: ${(props) => props.theme.cardColor};
   padding: 10px 20px;
   border-radius: 10px;
 `;
@@ -59,7 +102,7 @@ const Tab = styled.span<{ isActive: boolean }>`
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: ${(props) => props.theme.cardColor};
   padding: 7px 0px;
   border-radius: 10px;
   color: ${(props) =>
@@ -68,74 +111,17 @@ const Tab = styled.span<{ isActive: boolean }>`
     display: block;
   }
 `;
-// alt + shift + i (다중선택 후 커서 맨 뒤로 보내기)
-interface IInfoData {
-  id: string;
-  name: string;
-  symbol: string;
-  rank: number;
-  is_new: boolean;
-  is_active: boolean;
-  type: string;
-  logo: string;
-  description: string;
-  message: string;
-  open_source: boolean;
-  started_at: string;
-  development_status: string;
-  hardware_wallet: boolean;
-  proof_type: string;
-  org_structure: string;
-  hash_algorithm: string;
-  first_data_at: string;
-  last_data_at: string;
-}
-
-interface IPriceData {
-  id: string;
-  name: string;
-  symbol: string;
-  rank: number;
-  circulating_supply: number;
-  total_supply: number;
-  max_supply: number;
-  beta_value: number;
-  first_data_at: string;
-  last_updated: string;
-  quotes: {
-    USD: {
-      ath_date: string;
-      ath_price: number;
-      market_cap: number;
-      market_cap_change_24h: number;
-      percent_change_1h: number;
-      percent_change_1y: number;
-      percent_change_6h: number;
-      percent_change_7d: number;
-      percent_change_12h: number;
-      percent_change_15m: number;
-      percent_change_24h: number;
-      percent_change_30d: number;
-      percent_change_30m: number;
-      percent_from_price_ath: number;
-      price: number;
-      volume_24h: number;
-      volume_24h_change_24h: number;
-    };
-  };
-}
-interface RouteState {
-  state: {
-    name: string;
-  };
-}
 
 function Coin() {
   const { coinId } = useParams();
+  // useLocation은 Link의 state보내는거 받아올 때 사용
   const { state } = useLocation() as RouteState;
   // const [loading, setLoading] = useState(true);
   // const [info, setInfo] = useState<IInfoData>();
   // const [priceInfo, setPriceInfo] = useState<IPriceData>();
+
+  const { toggleDark, isDark } = useOutletContext<ICoinsProps>();
+  console.log("Coin:", isDark);
 
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
@@ -152,22 +138,6 @@ function Coin() {
 
   console.log("name:", state);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     // One `await` for fetch() and another `await` for .json()
-  //     const infoData = await (
-  //       await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-  //     ).json();
-
-  //     const priceData = await (
-  //       await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-  //     ).json();
-
-  //     setInfo(infoData);
-  //     setPriceInfo(priceData);
-  //     setLoading(false);
-  //   })();
-  // }, [coinId]);
   const loading = infoLoading || tickersLoading;
   return (
     <Container>
@@ -177,9 +147,15 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <Link to={`/`}>&lt; Home</Link>
         <Title>
+          <img
+            alt={infoData?.symbol}
+            src={`https://coinicons-api.vercel.app/api/icon/${infoData?.symbol.toLowerCase()}`}
+          />
           {state?.name ? state.name : loading ? "loading..." : infoData?.name}
         </Title>
+        <button onClick={toggleDark}>Toggle Mode</button>
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -223,7 +199,7 @@ function Coin() {
             </Tab>
           </Tabs>
 
-          <Outlet context={{ coinId }} />
+          <Outlet context={{ coinId, isDark }} />
         </>
       )}
     </Container>
